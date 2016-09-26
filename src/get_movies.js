@@ -1,20 +1,22 @@
 import fs from 'fs'
 import request from 'request'
 import cheerio from 'cheerio'
+import iconv from 'iconv-lite'
 
 import * as cookieManager from './cookie_manage.js'
 
 
-export function fetchMovie(movieUrl) {
-  let regex = /\/(\d*)$/
-  let replacement = `/list/${regex.exec(movieUrl)[1]}`
-  let movieResourceUrl = movieUrl.replace(regex, replacement)
+export function fetchMovie(movieUrl, name) {
 
-  console.info('Fetching: ', replacement)
+  console.info('Fetching: ', movieUrl, name)
 
   return new Promise((resolve, reject) => {
     request({
-      url: movieResourceUrl,
+      url: movieUrl,
+      encoding: null, //Encoding 相关，重要
+      headers: {
+        'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_11_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/53.0.2785.116 Safari/537.36'
+      },
       jar: cookieManager.getCookieJar()
     }, (err, res, body) => {
 
@@ -22,52 +24,43 @@ export function fetchMovie(movieUrl) {
         reject(err)
         console.info('Fetch failed:', err)
       }else {
-        resolve(analyzeBody(body))
-        console.info('Fetched: ', replacement)
+        resolve(analyzeBody(body, name))
       }
     })
   })
 }
 
 
-function analyzeBody (body) {
+function analyzeBody (body, name) {
 
+  var strBody = iconv.decode(body, 'gb2312') //Encoding 相关，重要
 
-  let $ = cheerio.load(body, {decodeEntities: false})
+  let $ = cheerio.load(strBody, {decodeEntities: false})
 
-  let item = $('.media-box .media-list .clearfix')
+  let $downloadTag = $('.tpc_content a')
 
   let result = []
 
-  item.each((i, el) => {
+  $downloadTag.each((i, el) => {
     let itemResult = {}
 
-    itemResult.title = $(el).find('.fl').find('a').attr('title')
+    itemResult.title = name
 
-    let downloadLink = $(el).find('.fr').find('a')
+    itemResult.link = $(el).html()
 
-    itemResult.links = []
-
-    downloadLink.each((d_i, d_el) => {
-      let link = $(d_el).attr('href') || $(d_el).attr('thunderhref') || $(d_el).attr('xmhref');
-      let linkName = $(d_el).html()
-
-      if(link) {
-        itemResult.links.push({
-          [linkName]: link
-        })
-      }
-    })
+    if(itemResult.link.includes('rmdown'))
 
     result.push(itemResult)
 
   })
 
-  let regex = /\s?[\/|\\]\s?/g
+  console.log(result)
 
-  let title = $("meta[name='keywords']").attr('content').replace(regex, '')
-
-  fs.writeFileSync(`./result/${title}.txt`, JSON.stringify(result, null, 2))
+  // let regex = /\s?[\/|\\]\s?/g
+  //
+  // let title = $("meta[name='keywords']").attr('content').replace(regex, '')
+  //
+  // fs.writeFileSync(`./result/${title}.txt`, JSON.stringify(result, null, 2))
 
 }
 

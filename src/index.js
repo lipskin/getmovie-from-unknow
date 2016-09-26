@@ -31,7 +31,7 @@ async function getLinksAndResolve(domain, listPageUrl, listPageQuery) {
 
   let result = await getLinksAndNextPage(url)
 
-  // await resolveEachLink(result.links)
+  await resolveEachLink(result.links)
 
   // if(result.nextPageQuery != null) {
   //   await getLinksAndResolve(listPageUrl, result.nextPageQuery)
@@ -41,9 +41,9 @@ async function getLinksAndResolve(domain, listPageUrl, listPageQuery) {
 async function resolveEachLink(links) {
   for (let i = 0; i < links.length; i++) {
     try{
-      await getMovies.fetchMovie(`${domain}${links[i]}`)
+      await getMovies.fetchMovie(`${domain}${links[i].link}`, links[i].name)
     }catch(e) {
-      console.log('skip error link')
+      console.log(e)
     }
   }
 }

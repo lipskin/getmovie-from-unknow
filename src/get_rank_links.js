@@ -39,7 +39,8 @@ function analyzeBody(body) {
   $ATags.each((i, el) => {
     let link = $(el).attr('href')
     let name = $(el).html()
-    console.log(link, name.toString(16))
+
+    links.push({link: link, name: name})
   })
 
   // if(!isLastPage) {
