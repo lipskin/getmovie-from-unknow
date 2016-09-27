@@ -2,13 +2,14 @@ import fs from 'fs'
 import request from 'request'
 import cheerio from 'cheerio'
 import iconv from 'iconv-lite'
+import downloadTorrent from './download_torrent.js'
 
 import * as cookieManager from './cookie_manage.js'
 
 
 export function fetchMovie(movieUrl, name) {
 
-  console.info('Fetching: ', movieUrl, name)
+  console.info('Fetching: ', movieUrl)
 
   return new Promise((resolve, reject) => {
     request({
@@ -31,7 +32,7 @@ export function fetchMovie(movieUrl, name) {
 }
 
 
-function analyzeBody (body, name) {
+async function analyzeBody (body, name) {
 
   var strBody = iconv.decode(body, 'gb2312') //Encoding 相关，重要
 
@@ -48,19 +49,14 @@ function analyzeBody (body, name) {
 
     itemResult.link = $(el).html()
 
-    if(itemResult.link.includes('rmdown'))
-
-    result.push(itemResult)
-
+    if(itemResult.link.includes('rmdown')) {
+      result.push(itemResult)
+    }
   })
 
-  console.log(result)
-
-  // let regex = /\s?[\/|\\]\s?/g
-  //
-  // let title = $("meta[name='keywords']").attr('content').replace(regex, '')
-  //
-  // fs.writeFileSync(`./result/${title}.txt`, JSON.stringify(result, null, 2))
+  for(var i = 0; i<result.length; i++){
+    await downloadTorrent(result[i].link, result[i].title)
+  }
 
 }
 
@@ -73,7 +69,7 @@ export function prepareFolder() {
 
 function fileExists(filename){
   try{
-    require('fs').accessSync(filename)
+    fs.accessSync(filename)
     return true;
   }catch(e){
     return false;
