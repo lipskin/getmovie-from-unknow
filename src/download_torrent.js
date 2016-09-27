@@ -2,7 +2,7 @@ import request from 'request'
 import cheerio from 'cheerio'
 import fs from 'fs'
 
-export default function downloadTorrent(downloadUrl, name) {
+export default function downloadTorrent(downloadUrl, name, index) {
   console.log('download:', downloadUrl)
   return new Promise((resolve, reject) => {
     request({
@@ -12,13 +12,13 @@ export default function downloadTorrent(downloadUrl, name) {
         console.log(err)
         reject(err)
       }else {
-        resolve(analyzeBody(downloadUrl, body, name))
+        resolve(analyzeBody(downloadUrl, body, name, index))
       }
     })
   })
 }
 
-async function analyzeBody(downloadUrl, body, name) {
+async function analyzeBody(downloadUrl, body, name, index) {
   let $ = cheerio.load(body)
 
   let reff = $('input[name=reff]').val()
@@ -28,17 +28,15 @@ async function analyzeBody(downloadUrl, body, name) {
 
   let url = `${downloadUrl.replace(regex, 'download.php')}?ref=${ref}&reff=${reff}`
 
-  await submitDownloadReq(url, name)
+  await submitDownloadReq(url, name, index)
 }
 
 
-function submitDownloadReq(downloadUrl, name) {
+function submitDownloadReq(downloadUrl, name, index) {
 
   let regex = /\//g
 
   let newName = name.replace(regex, '-')
-
-  console.log(downloadUrl)
 
   new Promise((resolve, reject) => {
     request({
@@ -47,7 +45,7 @@ function submitDownloadReq(downloadUrl, name) {
       if(err) {
         reject(err)
       }else {
-        fs.writeFileSync(`./result/${newName}.torrent`, body)
+        fs.writeFileSync(`./result/${newName}[${index}].torrent`, body)
       }
     })
   })

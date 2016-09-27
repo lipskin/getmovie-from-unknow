@@ -53,7 +53,7 @@ async function analyzeBody (body, name) {
   // console.log(result)
 
   for(var i = 0; i<result.length; i++){
-    await downloadTorrent(result[i].link, result[i].title)
+    await downloadTorrent(result[i].link, result[i].title, i)
   }
 
 }

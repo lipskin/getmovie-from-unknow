@@ -17,10 +17,6 @@ async function init() {
 
   await getLinksAndResolve(domain, listPageUrl, startPageIndex)
 
-  await LoginManager.logout()
-
-  console.info('Logout success')
-
 }
 
 
