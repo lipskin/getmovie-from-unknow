@@ -2,10 +2,12 @@ import request from 'request'
 import cheerio from 'cheerio' //Encoding 相关，重要
 import iconv from 'iconv-lite'
 
-export default function getLinksAndNextPageWrap(url) {
+export default function getLinksAndNextPageWrap(url, pageIndex) {
+  console.log(`${url}${pageIndex}`)
+
   return new Promise((resolve, reject) => {
     request({
-      url: url,
+      url: `${url}${pageIndex}`,
       encoding: null, //Encoding 相关，重要
       headers: {
         'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_11_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/53.0.2785.116 Safari/537.36'
@@ -32,10 +34,6 @@ function analyzeBody(body) {
 
   let links = []
 
-  // let isLastPage = $('.pages a').last().hasClass('cur')
-
-  let nextPageQuery = null
-
   $ATags.each((i, el) => {
     let link = $(el).attr('href')
     let name = $(el).html()
@@ -43,12 +41,7 @@ function analyzeBody(body) {
     links.push({link: link, name: name})
   })
 
-  // if(!isLastPage) {
-  //   nextPageQuery = $('.pages a').eq(-2).attr('href')
-  // }
-
   return {
-    links: links,
-    nextPageQuery: nextPageQuery
+    links: links
   }
 }

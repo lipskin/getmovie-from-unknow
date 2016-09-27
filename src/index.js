@@ -5,8 +5,9 @@ import * as LoginManager from './login'
 import * as getMovies from './get_movies'
 
 const domain = 'http://cl.dgkiz.com/'
-const listPageUrl = 'thread0806.php'
-const startListPageQuery = '?fid=2&search=&page=2'
+const listPageUrl = 'thread0806.php?fid=2&search=&page='
+const startPageIndex = '2'
+const endPageIndex = '20'
 
 init();
 
@@ -14,7 +15,7 @@ async function init() {
 
   getMovies.prepareFolder()
 
-  await getLinksAndResolve(domain, listPageUrl, startListPageQuery)
+  await getLinksAndResolve(domain, listPageUrl, startPageIndex)
 
   await LoginManager.logout()
 
@@ -23,19 +24,15 @@ async function init() {
 }
 
 
-async function getLinksAndResolve(domain, listPageUrl, listPageQuery) {
+async function getLinksAndResolve(domain, listPageUrl, startPageIndex) {
 
-  let url = `${domain}${listPageUrl}${listPageQuery}`;
+  let url = `${domain}${listPageUrl}`;
 
-  console.log('Try to get link from this URL:', url)
-
-  let result = await getLinksAndNextPage(url)
-
-  await resolveEachLink(result.links)
-
-  // if(result.nextPageQuery != null) {
-  //   await getLinksAndResolve(listPageUrl, result.nextPageQuery)
-  // }
+  for(var index = startPageIndex; index <= endPageIndex; index++) {
+    console.log(`Try to get in [${index}] page`)
+    let result = await getLinksAndNextPage(url, index)
+    await resolveEachLink(result.links)
+  }
 }
 
 async function resolveEachLink(links) {

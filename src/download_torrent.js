@@ -3,11 +3,13 @@ import cheerio from 'cheerio'
 import fs from 'fs'
 
 export default function downloadTorrent(downloadUrl, name) {
+  console.log('download:', downloadUrl)
   return new Promise((resolve, reject) => {
     request({
       url: downloadUrl
     }, (err, res, body) => {
       if(err) {
+        console.log(err)
         reject(err)
       }else {
         resolve(analyzeBody(downloadUrl, body, name))
@@ -18,7 +20,7 @@ export default function downloadTorrent(downloadUrl, name) {
 
 async function analyzeBody(downloadUrl, body, name) {
   let $ = cheerio.load(body)
-  // console.log(body)
+
   let reff = $('input[name=reff]').val()
   let ref = $('input[name=ref]').val()
 

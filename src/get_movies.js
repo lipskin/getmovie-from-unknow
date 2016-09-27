@@ -4,9 +4,6 @@ import cheerio from 'cheerio'
 import iconv from 'iconv-lite'
 import downloadTorrent from './download_torrent.js'
 
-import * as cookieManager from './cookie_manage.js'
-
-
 export function fetchMovie(movieUrl, name) {
 
   console.info('Fetching: ', movieUrl)
@@ -17,8 +14,7 @@ export function fetchMovie(movieUrl, name) {
       encoding: null, //Encoding 相关，重要
       headers: {
         'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_11_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/53.0.2785.116 Safari/537.36'
-      },
-      jar: cookieManager.getCookieJar()
+      }
     }, (err, res, body) => {
 
       if(err) {
@@ -53,6 +49,8 @@ async function analyzeBody (body, name) {
       result.push(itemResult)
     }
   })
+
+  // console.log(result)
 
   for(var i = 0; i<result.length; i++){
     await downloadTorrent(result[i].link, result[i].title)
