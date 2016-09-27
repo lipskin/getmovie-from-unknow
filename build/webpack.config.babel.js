@@ -24,10 +24,5 @@ export default {
       }
     ],
     noParse: /node_modules\/json-schema\/lib\/validate\.js/
-  },
-  plugins: [
-    new CopyWebpackPlugin([
-      { from: 'cookie.json' }
-    ])
-  ]
+  }
 }

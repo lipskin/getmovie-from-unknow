@@ -1,7 +1,4 @@
-import request from 'request'
-
 import getLinksAndNextPage from './get_rank_links'
-import * as LoginManager from './login'
 import * as getMovies from './get_movies'
 
 const domain = 'http://cl.dgkiz.com/'
